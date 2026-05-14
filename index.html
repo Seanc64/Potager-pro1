@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PotagerPro">
+<meta name="description" content="Calendrier de jardinage bio personnalisé selon vos plants, votre région et la météo">
+<meta name="theme-color" content="#1a3a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PotagerPro">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>🌿 PotagerPro — Jardinage Bio</title>
+<style>
+/* ═══════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════ */
+:root {
+  --bg: #0d1a07;
+  --bg2: #111f08;
+  --bg3: #162a0a;
+  --card: #1a2e0e;
+  --card2: #1f3512;
+  --border: #2a4a18;
+  --border2: #3a6028;
+  --green: #4a8c2a;
+  --green2: #6aaa48;
+  --green3: #90cc68;
+  --mint: #b8e090;
+  --cream: #f0ead8;
+  --text: #d8e8c0;
+  --text2: #8aaa6a;
+  --text3: #5a7a3a;
+  --gold: #c8a030;
+  --gold2: #e8c050;
+  --rust: #b84020;
+  --sky: #3a8aaa;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+#app{position:fixed;inset:0;bottom:60px;overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page.active{display:block}
+
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;height:60px;
+  background:var(--bg2);border-top:1px solid var(--border);
+  display:flex;z-index:100;
+  backdrop-filter:blur(10px);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:none;border:none;color:var(--text3);font-family:'DM Sans',sans-serif;
+  font-size:10px;font-weight:500;cursor:pointer;transition:all .2s;
+}
+.nav-btn.active{color:var(--green3)}
+.nav-btn .ni{font-size:20px;line-height:1;transition:transform .2s}
+.nav-btn.active .ni{transform:scale(1.15)}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.page-header{
+  padding:20px 16px 14px;position:sticky;top:0;z-index:10;
+  background:linear-gradient(180deg,var(--bg) 80%,transparent);
+}
+.page-header h1{
+  font-family:'Playfair Display',serif;font-size:22px;color:var(--mint);
+  display:flex;align-items:center;gap:8px;
+}
+.page-header p{font-size:12px;color:var(--text3);margin-top:3px;font-weight:300}
+
+/* ═══════════════════════════════════════
+   ONBOARDING
+═══════════════════════════════════════ */
+#onboarding{
+  position:fixed;inset:0;background:var(--bg);z-index:200;
+  overflow-y:auto;padding:0;
+}
+.ob-hero{
+  background:linear-gradient(160deg,#1a3a0a 0%,#0d2a05 50%,#0a1a04 100%);
+  padding:48px 24px 32px;text-align:center;position:relative;overflow:hidden;
+}
+.ob-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(106,170,72,.15) 0%,transparent 70%);
+}
+.ob-logo{font-size:56px;margin-bottom:12px;display:block;
+  animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.ob-title{font-family:'Playfair Display',serif;font-size:32px;color:var(--mint);line-height:1.2}
+.ob-title em{font-style:italic;color:var(--gold2)}
+.ob-sub{font-size:14px;color:var(--text2);margin-top:10px;font-weight:300;line-height:1.6}
+
+.ob-steps{padding:24px 16px}
+.ob-step{
+  display:flex;align-items:flex-start;gap:14px;padding:16px;
+  background:var(--card);border-radius:var(--radius);border:1px solid var(--border);
+  margin-bottom:10px;
+}
+.ob-step-num{
+  width:32px;height:32px;border-radius:50%;background:var(--green);
+  color:white;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.ob-step h3{font-size:14px;font-weight:600;color:var(--mint);margin-bottom:3px}
+.ob-step p{font-size:12px;color:var(--text2);line-height:1.5}
+
+.ob-cta{
+  margin:8px 16px 32px;padding:16px;
+  background:linear-gradient(135deg,var(--green),var(--green2));
+  border:none;border-radius:var(--radius);color:white;
+  font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;
+  width:calc(100% - 32px);cursor:pointer;
+  box-shadow:0 4px 20px rgba(74,140,42,.4);
+  transition:all .2s;
+}
+.ob-cta:active{transform:scale(.98)}
+
+/* ═══════════════════════════════════════
+   SETUP WIZARD
+═══════════════════════════════════════ */
+#setup{position:fixed;inset:0;background:var(--bg);z-index:190;overflow-y:auto;display:none}
+.setup-header{
+  padding:20px 16px 12px;background:var(--bg2);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;
+}
+.setup-progress{
+  height:3px;background:var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden;
+}
+.setup-progress-fill{height:100%;background:var(--green2);border-radius:2px;transition:width .4s}
+.setup-step-label{font-size:12px;color:var(--text3);font-weight:500}
+.setup-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--mint);margin-top:4px}
+
+.setup-body{padding:16px}
+.setup-section{margin-bottom:20px}
+.setup-section-title{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text3);margin-bottom:10px;
+}
+
+/* LOCATION */
+.location-btn{
+  width:100%;padding:14px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);color:var(--text);font-size:14px;font-weight:500;
+  font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:all .2s;
+}
+.location-btn:active,.location-btn.active{border-color:var(--green2);background:var(--card2)}
+.location-display{
+  margin-top:10px;padding:12px;background:var(--card2);border-radius:var(--radius-sm);
+  font-size:13px;color:var(--green3);display:none;
+}
+
+/* INPUT */
+.setup-input{
+  width:100%;padding:12px 14px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.setup-input:focus{border-color:var(--green2)}
+.setup-input::placeholder{color:var(--text3)}
+
+/* PARCELLE BUILDER */
+.parcel-builder{display:flex;flex-direction:column;gap:10px}
+.parcel-row{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:12px;position:relative;
+}
+.parcel-row-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.parcel-type-select{
+  flex:1;padding:8px 10px;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+}
+.parcel-dims{display:flex;gap:8px;margin-bottom:8px}
+.parcel-dim-input{
+  flex:1;padding:8px 10px;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+  text-align:center;
+}
+.parcel-dim-input::placeholder{color:var(--text3)}
+.parcel-sun-row{display:flex;gap:6px}
+.sun-opt{
+  flex:1;padding:6px;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text3);font-size:11px;font-weight:600;
+  text-align:center;cursor:pointer;transition:all .15s;
+}
+.sun-opt.active{background:var(--card2);border-color:var(--gold);color:var(--gold2)}
+.del-parcel{
+  position:absolute;top:10px;right:10px;background:rgba(184,64,32,.2);border:none;
+  border-radius:50%;width:24px;height:24px;color:var(--rust);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.add-parcel-btn{
+  padding:12px;background:transparent;border:1.5px dashed var(--border2);
+  border-radius:var(--radius);color:var(--green2);font-size:13px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;transition:all .2s;
+}
+.add-parcel-btn:active{background:var(--card)}
+
+/* PLANT PICKER */
+.plant-search{
+  width:100%;padding:10px 14px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;
+  outline:none;margin-bottom:10px;
+}
+.plant-search:focus{border-color:var(--green2)}
+.plant-categories{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.plant-categories::-webkit-scrollbar{display:none}
+.cat-btn{
+  flex-shrink:0;padding:5px 12px;background:var(--card);border:1px solid var(--border);
+  border-radius:20px;color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.cat-btn.active{background:var(--green);border-color:var(--green);color:white}
+.plant-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.plant-pick-card{
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:10px 12px;cursor:pointer;transition:all .15s;position:relative;
+}
+.plant-pick-card.selected{border-color:var(--green2);background:var(--card2)}
+.plant-pick-card .pp-emoji{font-size:24px;display:block;margin-bottom:4px}
+.plant-pick-card .pp-name{font-size:12px;font-weight:600;color:var(--text)}
+.plant-pick-card .pp-cat{font-size:10px;color:var(--text3);margin-top:1px}
+.plant-pick-card .pp-check{
+  position:absolute;top:6px;right:6px;width:18px;height:18px;
+  background:var(--green2);border-radius:50%;display:none;
+  align-items:center;justify-content:center;font-size:10px;color:white;
+}
+.plant-pick-card.selected .pp-check{display:flex}
+
+/* SETUP NAV */
+.setup-nav{
+  display:flex;gap:10px;padding:16px;position:sticky;bottom:0;
+  background:linear-gradient(0deg,var(--bg) 80%,transparent);
+}
+.setup-back{
+  padding:13px 20px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);color:var(--text2);font-size:14px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+}
+.setup-next{
+  flex:1;padding:13px;background:linear-gradient(135deg,var(--green),var(--green2));
+  border:none;border-radius:var(--radius);color:white;font-size:14px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 16px rgba(74,140,42,.3);
+}
+.setup-next:active{transform:scale(.98)}
+
+/* ═══════════════════════════════════════
+   PAGE AUJOURD'HUI
+═══════════════════════════════════════ */
+.today-hero{
+  margin:0 14px 14px;padding:18px;
+  background:linear-gradient(135deg,var(--card2),var(--card));
+  border-radius:var(--radius);border:1px solid var(--border2);
+  position:relative;overflow:hidden;
+}
+.today-hero::before{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:80px;height:80px;background:radial-gradient(circle,rgba(144,204,104,.12),transparent);
+  border-radius:50%;
+}
+.today-weather{
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+  font-size:12px;color:var(--text2);
+}
+.weather-icon{font-size:20px}
+.today-date{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.08em}
+.today-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--mint);margin-top:4px}
+.today-location{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:4px}
+
+.progress-wrap{margin-top:12px}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green3));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.progress-text{font-size:11px;color:var(--text3);margin-top:5px}
+
+.section-label{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text3);padding:4px 14px 8px;display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* TIME BLOCKS */
+.time-block{margin:0 14px 8px}
+.time-hdr{
+  display:flex;align-items:center;gap:8px;padding:10px 14px 8px;
+  border-radius:var(--radius) var(--radius) 0 0;border:1px solid;border-bottom:none;
+}
+.time-hdr-morn{background:#1e1a0a;border-color:#3a3010}
+.time-hdr-eve{background:#0a1020;border-color:#1a2840}
+.time-hdr-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.lbl-morn{color:#d4a030}.lbl-eve{color:#5090c0}
+
+.time-tasks{border-radius:0 0 var(--radius) var(--radius);border:1px solid;border-top:none;overflow:hidden}
+.tasks-morn{background:#120e04;border-color:#3a3010}
+.tasks-eve{background:#060a14;border-color:#1a2840}
+
+.task-item{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 14px;
+  border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;
+  transition:background .1s;-webkit-user-select:none;user-select:none;
+}
+.task-item:last-child{border-bottom:none}
+.task-item:active{background:rgba(255,255,255,.04)}
+.task-item.done .task-txt{text-decoration:line-through;opacity:.35}
+.task-item.done .ttag{opacity:.3}
+
+.task-check{
+  width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  background:transparent;transition:all .15s;
+}
+.task-item.done .task-check{background:var(--green);border-color:var(--green)}
+.chk-svg{display:none;width:12px;height:12px}
+.task-item.done .chk-svg{display:block}
+
+.ttag{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  padding:2px 6px;border-radius:4px;flex-shrink:0;margin-top:2px;white-space:nowrap;
+}
+.tag-arrosage{background:#0a1e30;color:#50a0d0}
+.tag-traitement{background:#0a1e0a;color:#50b840}
+.tag-taille{background:#201408;color:#b07030}
+.tag-recolte{background:#200a06;color:#d06040}
+.tag-sol{background:#181008;color:#a08030}
+.tag-observation{background:#180a20;color:#9060c0}
+.tag-balcon{background:#081620;color:#4090c0}
+.tag-urgent{background:#200606;color:#d03030}
+.tag-meteo{background:#081a20;color:#40a0c0}
+
+.task-txt{font-size:13px;line-height:1.45;color:var(--text);flex:1}
+.task-item.done .task-txt{color:var(--text3)}
+
+.tip-card{
+  margin:0 14px 14px;padding:12px 14px;
+  background:linear-gradient(135deg,rgba(26,46,14,.8),rgba(20,36,10,.8));
+  border-left:3px solid var(--green2);border-radius:0 var(--radius) var(--radius) 0;
+  font-size:12px;color:var(--text2);line-height:1.6;
+}
+.tip-card strong{color:var(--mint)}
+
+/* MÉTÉO ALERT */
+.meteo-alert{
+  margin:0 14px 10px;padding:10px 14px;
+  background:rgba(56,130,170,.15);border:1px solid rgba(56,130,170,.4);
+  border-radius:var(--radius-sm);font-size:12px;color:#80c0e0;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* ═══════════════════════════════════════
+   CALENDRIER
+═══════════════════════════════════════ */
+.month-header{
+  padding:12px 14px 6px;display:flex;align-items:center;
+  position:sticky;top:0;background:var(--bg);z-index:5;
+}
+.month-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--mint);flex:1}
+.month-stats{font-size:11px;color:var(--text3)}
+
+.day-row{
+  display:flex;align-items:center;padding:11px 14px;
+  border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;gap:10px;
+  transition:background .1s;
+}
+.day-row:active{background:var(--card)}
+.day-row.today-row{background:rgba(74,140,42,.08);border-left:3px solid var(--green2)}
+.day-row.past-row{opacity:.45}
+
+.day-num{font-size:20px;font-weight:700;color:var(--green);min-width:30px;text-align:center;font-family:'Playfair Display',serif}
+.today-row .day-num{color:var(--mint)}
+.day-info{flex:1}
+.day-name-txt{font-size:13px;font-weight:500;color:var(--text)}
+.day-tag-icons{font-size:12px;margin-top:2px;letter-spacing:2px}
+.day-prog{font-size:11px;color:var(--text3);font-weight:600}
+.day-prog.all{color:var(--green3)}
+.today-pill{
+  background:var(--green);color:white;font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:10px;margin-left:6px;text-transform:uppercase;letter-spacing:.06em;
+}
+
+/* DETAIL JOUR */
+.back-bar{
+  display:flex;align-items:center;gap:8px;padding:14px 16px;
+  background:var(--bg2);border-bottom:1px solid var(--border);cursor:pointer;
+  font-size:13px;color:var(--green2);font-weight:500;sticky;top:0;position:sticky;z-index:10;
+}
+.back-bar:active{background:var(--card)}
+
+/* ═══════════════════════════════════════
+   PARCELLES
+═══════════════════════════════════════ */
+.parcel-card-view{
+  margin:10px 14px;background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;
+}
+.parcel-card-hdr{
+  padding:14px;background:var(--card2);border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.parcel-card-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--mint)}
+.parcel-card-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.parcel-card-badge{
+  font-size:10px;background:var(--green);color:white;
+  padding:3px 9px;border-radius:10px;font-weight:600;flex-shrink:0;
+}
+.plant-chips-wrap{padding:12px 14px;display:flex;flex-wrap:wrap;gap:7px}
+.plant-chip-view{
+  display:flex;align-items:center;gap:5px;padding:6px 10px;
+  border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;
+  border:1px solid var(--border);background:var(--bg2);color:var(--text);
+  transition:all .12s;
+}
+.plant-chip-view:active{transform:scale(.96)}
+
+/* FICHE PLANTE */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none}
+.sheet-overlay.open{display:block}
+.plant-sheet{
+  position:fixed;bottom:0;left:0;right:0;background:var(--card);
+  border-radius:18px 18px 0 0;border-top:2px solid var(--border2);
+  z-index:301;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:75vh;overflow-y:auto;
+}
+.plant-sheet.open{transform:translateY(0)}
+.sheet-drag{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:10px auto 0}
+.sheet-hdr{padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
+.sheet-emoji{font-size:32px}
+.sheet-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--mint)}
+.sheet-family{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.sheet-close{margin-left:auto;background:var(--bg2);border:none;color:var(--text2);width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer}
+.info-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 12px}
+.info-pill{background:var(--bg2);border-radius:var(--radius-sm);padding:8px 10px;border:1px solid var(--border)}
+.info-pill strong{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.info-pill span{font-size:12px;color:var(--text)}
+.assoc-wrap{padding:0 16px 20px}
+.assoc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:6px}
+.assoc-good{font-size:12px;color:#70c050;line-height:1.8}
+.assoc-bad{font-size:12px;color:#c05030;line-height:1.8;margin-top:8px}
+
+/* ═══════════════════════════════════════
+   RECETTES & INFOS
+═══════════════════════════════════════ */
+.recipe-card{
+  margin:8px 14px;background:var(--card);border-radius:var(--radius);
+  border-left:4px solid var(--green);overflow:hidden;
+}
+.recipe-hdr{
+  padding:12px 14px;background:var(--card2);display:flex;align-items:center;
+  gap:10px;cursor:pointer;
+}
+.recipe-hdr-title{font-size:14px;font-weight:600;color:var(--mint);flex:1}
+.recipe-chevron{font-size:12px;color:var(--text3);transition:transform .2s}
+.recipe-card.open .recipe-chevron{transform:rotate(180deg)}
+.recipe-body{display:none;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.7}
+.recipe-card.open .recipe-body{display:block}
+
+.settings-card{margin:8px 14px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.settings-row{
+  padding:14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+}
+.settings-row:last-child{border-bottom:none}
+.settings-row:active{background:var(--card2)}
+.settings-label{font-size:13px;font-weight:500;color:var(--text)}
+.settings-value{font-size:12px;color:var(--text3)}
+.settings-chevron{color:var(--text3);font-size:14px}
+
+.danger-btn{
+  margin:10px 14px;padding:14px;width:calc(100% - 28px);
+  background:rgba(184,64,32,.15);border:1px solid rgba(184,64,32,.4);
+  border-radius:var(--radius);color:var(--rust);font-size:13px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+}
+
+/* ═══════════════════════════════════════
+   LOADING
+═══════════════════════════════════════ */
+.loading{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:200px;gap:12px;color:var(--text3);font-size:13px;
+}
+.spinner{
+  width:32px;height:32px;border:2px solid var(--border);
+  border-top-color:var(--green2);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════ */
+.empty{padding:40px 20px;text-align:center;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.empty p{font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     ONBOARDING
+════════════════════════════════════ -->
+<div id="onboarding">
+  <div class="ob-hero">
+    <span class="ob-logo">🌿</span>
+    <div class="ob-title">Potager<em>Pro</em></div>
+    <div class="ob-sub">Votre calendrier de jardinage bio<br>personnalisé selon vos plants et votre région</div>
+  </div>
+  <div class="ob-steps">
+    <div class="ob-step">
+      <div class="ob-step-num">1</div>
+      <div>
+        <h3>📍 Votre localisation</h3>
+        <p>Adaptez le calendrier au climat de votre région — dates de gel, chaleur estivale, précipitations.</p>
+      </div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num">2</div>
+      <div>
+        <h3>🗺️ Vos parcelles</h3>
+        <p>Définissez vos espaces de culture : pleine terre, jardinière, balcon, serre. Taille et exposition.</p>
+      </div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num">3</div>
+      <div>
+        <h3>🌱 Vos plants</h3>
+        <p>Choisissez parmi 60+ variétés de légumes, fruits, aromatiques et fleurs compagnes.</p>
+      </div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num">4</div>
+      <div>
+        <h3>📅 Votre calendrier</h3>
+        <p>Recevez les tâches du jour matin et soir, avec alertes météo et conseils bio personnalisés.</p>
+      </div>
+    </div>
+  </div>
+  <button class="ob-cta" onclick="startSetup()">Commencer mon jardin →</button>
+</div>
+
+<!-- ════════════════════════════════════
+     SETUP WIZARD
+════════════════════════════════════ -->
+<div id="setup">
+  <div class="setup-header">
+    <div class="setup-progress"><div class="setup-progress-fill" id="setup-prog-fill" style="width:25%"></div></div>
+    <div class="setup-step-label" id="setup-step-label">Étape 1 sur 4</div>
+    <div class="setup-title" id="setup-title">📍 Votre localisation</div>
+  </div>
+  <div class="setup-body" id="setup-body"></div>
+  <div class="setup-nav">
+    <button class="setup-back" id="setup-back-btn" onclick="setupBack()">← Retour</button>
+    <button class="setup-next" id="setup-next-btn" onclick="setupNext()">Continuer →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     APP PRINCIPALE
+════════════════════════════════════ -->
+<div id="app">
+  <!-- Aujourd'hui -->
+  <div class="page active" id="page-today">
+    <div class="page-header">
+      <h1>🌿 PotagerPro</h1>
+      <p id="hdr-date">Chargement...</p>
+    </div>
+    <div id="today-content"></div>
+  </div>
+
+  <!-- Calendrier -->
+  <div class="page" id="page-cal">
+    <div class="page-header">
+      <h1>📅 Calendrier</h1>
+      <p id="cal-subtitle">Toute la saison</p>
+    </div>
+    <div id="cal-content"></div>
+  </div>
+
+  <!-- Détail jour -->
+  <div class="page" id="page-day">
+    <div class="back-bar" onclick="backToCal()">← Calendrier</div>
+    <div id="day-detail"></div>
+  </div>
+
+  <!-- Parcelles -->
+  <div class="page" id="page-parcelles">
+    <div class="page-header">
+      <h1>🗺️ Mes Parcelles</h1>
+      <p id="parcelles-sub">Vos espaces de culture</p>
+    </div>
+    <div id="parcelles-content"></div>
+  </div>
+
+  <!-- Infos / Recettes -->
+  <div class="page" id="page-info">
+    <div class="page-header">
+      <h1>⚙️ Recettes & Réglages</h1>
+      <p>Traitements bio · Paramètres</p>
+    </div>
+    <div id="info-content"></div>
+  </div>
+</div>
+
+<!-- NAV BAS -->
+<div id="bottom-nav">
+  <button class="nav-btn active" id="nav-today" onclick="showPage('today')">
+    <span class="ni">🌱</span>Aujourd'hui
+  </button>
+  <button class="nav-btn" id="nav-cal" onclick="showPage('cal')">
+    <span class="ni">📅</span>Calendrier
+  </button>
+  <button class="nav-btn" id="nav-parcelles" onclick="showPage('parcelles')">
+    <span class="ni">🗺️</span>Parcelles
+  </button>
+  <button class="nav-btn" id="nav-info" onclick="showPage('info')">
+    <span class="ni">⚙️</span>Recettes
+  </button>
+</div>
+
+<!-- FICHE PLANTE -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+<div class="plant-sheet" id="plant-sheet">
+  <div class="sheet-drag"></div>
+  <div class="sheet-hdr">
+    <span class="sheet-emoji" id="s-emoji"></span>
+    <div><div class="sheet-name" id="s-name"></div><div class="sheet-family" id="s-family"></div></div>
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+  </div>
+  <div class="info-pills" id="s-pills"></div>
+  <div class="assoc-wrap" id="s-assoc"></div>
+</div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════
+// BASE DE DONNÉES COMPLÈTE DES PLANTS
+// ════════════════════════════════════════════
+var PLANTS_DB = {
+  // TOMATES
+  tomate:{e:'🍅',n:'Tomate',cat:'Légume-fruit',famille:'Solanacée',
+    esp:'60–80cm',sol:'Plein soleil',eau:'Régulier au pied',rec:'Juil–Oct',
+    semer:'Fév–Mar sous abri',planter:'Mai (après gel)',
+    good:'Basilic, carottes, persil, soucis',bad:'Fenouil, pomme de terre',
+    taches:{
+      mai:['Planter en pleine terre après les Saints de Glace','Installer tuteurs 1,5m','Pailler le pied (8cm)','Arroser au pied chaque soir les 7 premiers jours'],
+      juin:['Pincer les gourmands chaque semaine','Purin d\'ortie foliaire 10% hebdomadaire','Supprimer feuilles du bas','Surveiller mildiou'],
+      juillet:['Arrosage quotidien tôt le matin','Récolter à maturité','Étêter après 4-5 bouquets','Traitement mildiou préventif'],
+      aout:['Grande récolte quotidienne','Préparer les conserves','Continuer traitement mildiou','Arrosage régulier'],
+      septembre:['Récolter même les tomates légèrement vertes','Arracher après les premières gelées'],
+    }},
+  tomate_cerise:{e:'🍒',n:'Tomate cerise',cat:'Légume-fruit',famille:'Solanacée',
+    esp:'50–60cm',sol:'Plein soleil',eau:'Régulier, éviter à-coups',rec:'Juin–Oct',
+    semer:'Fév–Mar sous abri',planter:'Mai (après gel)',
+    good:'Basilic, soucis, capucines',bad:'Fenouil',
+    taches:{
+      mai:['Planter en pot ou pleine terre','Tuteur 80cm','Arroser régulièrement'],
+      juin:['Pincer les gourmands','Première récolte possible fin juin','Secouer les grappes pour la pollinisation'],
+      juillet:['Récolter chaque jour','Arrosage quotidien'],
+      aout:['Production intensive','Fertiliser en pot au purin d\'ortie'],
+      septembre:['Récolte continue jusqu\'aux gelées'],
+    }},
+  poivron:{e:'🫑',n:'Poivron',cat:'Légume-fruit',famille:'Solanacée',
+    esp:'40–50cm',sol:'Plein soleil chaud',eau:'Régulier',rec:'Juil–Sep',
+    semer:'Jan–Fév sous abri',planter:'Mi-mai (après gel)',
+    good:'Basilic, carottes, soucis',bad:'Fenouil',
+    taches:{
+      mai:['Planter après le 15 mai uniquement','Pailler le pied','Tuteur léger'],
+      juin:['Arrosage régulier 2-3x/semaine','Surveiller pucerons'],
+      juillet:['Récolter poivrons verts ou laisser rougir','Arrosage quotidien en canicule'],
+      aout:['Pleine production','Récolter régulièrement pour stimuler'],
+    }},
+  aubergine:{e:'🍆',n:'Aubergine',cat:'Légume-fruit',famille:'Solanacée',
+    esp:'50–60cm',sol:'Plein soleil très chaud',eau:'Copieux',rec:'Juil–Sep',
+    semer:'Jan–Fév sous abri',planter:'Mi-mai (après gel)',
+    good:'Basilic, estragon, haricots',bad:'Fenouil',
+    taches:{
+      mai:['Planter après le 15 mai','Sol très riche, plein soleil'],
+      juin:['Arrosage copieux','Surveiller doryphores'],
+      juillet:['Récolter brillantes et fermes','Arrosage quotidien'],
+      aout:['Pleine production','Fertiliser au purin d\'ortie'],
+    }},
+  concombre:{e:'🥒',n:'Concombre',cat:'Légume-fruit',famille:'Cucurbitacée',
+    esp:'50cm (treillis)',sol:'Soleil',eau:'Abondant, régulier',rec:'Juil–Sep',
+    semer:'Avr sous abri',planter:'Mai–Juin',
+    good:'Haricots, capucines, aneth, bourrache',bad:'Pomme de terre, fenouil',
+    taches:{
+      mai:['Installer le treillis','Planter et pailler'],
+      juin:['Arrosage abondant','Pincer après 5-6 feuilles','Surveiller oïdium'],
+      juillet:['Récolter à 15-20cm','Arrosage quotidien'],
+      aout:['Production continue','Traitement oïdium si nécessaire'],
+    }},
+  courgette:{e:'🥒',n:'Courgette',cat:'Légume-fruit',famille:'Cucurbitacée',
+    esp:'1–1.5m',sol:'Plein soleil',eau:'Abondant',rec:'Juin–Oct',
+    semer:'Avr sous abri',planter:'Mai',
+    good:'Capucines, bourrache, soucis',bad:'Pomme de terre',
+    taches:{
+      mai:['Planter avec beaucoup d\'espace','Pailler généreusement','Pièges à limaces'],
+      juin:['Récolter petites (15-18cm)','Arrosage quotidien','Surveiller oïdium'],
+      juillet:['Récolter tous les 2-3 jours','Arrosage abondant'],
+      aout:['Production intensive','Traitement oïdium'],
+      septembre:['Dernières récoltes','Arracher les plants épuisés'],
+    }},
+  courge:{e:'🎃',n:'Courge/Potiron',cat:'Légume-fruit',famille:'Cucurbitacée',
+    esp:'1.5–2m',sol:'Plein soleil',eau:'Copieux',rec:'Août–Oct',
+    semer:'Avr sous abri',planter:'Mai–Juin',
+    good:'Maïs, haricots, capucines, bourrache',bad:'Pomme de terre',
+    taches:{
+      mai:['Planter sur butte enrichie','Sol très riche'],
+      juin:['Arrosage profond 2x/semaine','Laisser s\'étaler'],
+      juillet:['Glisser une tuile sous les fruits','Pincer après 2-3 fruits'],
+      aout:['Récolter quand tige se liège','Stocker au sec 2 semaines'],
+    }},
+  melon:{e:'🍈',n:'Melon',cat:'Légume-fruit',famille:'Cucurbitacée',
+    esp:'80cm–1m',sol:'Plein soleil chaud',eau:'Régulier, réduire à maturité',rec:'Juil–Août',
+    semer:'Avr sous abri',planter:'Mi-mai',
+    good:'Bourrache, soucis, maïs',bad:'Pomme de terre',
+    taches:{
+      mai:['Planter après le 15 mai','Sol sableux et chaud','Pailler chaudement'],
+      juin:['Arrosage modéré','Tuile sous les fruits','Ne pas traiter en floraison'],
+      juillet:['Réduire arrosage 1 semaine avant récolte','Récolter quand tige fendille'],
+    }},
+  // SALADES & FEUILLES
+  salade:{e:'🥗',n:'Salade/Laitue',cat:'Légume-feuille',famille:'Astéracée',
+    esp:'25–30cm',sol:'Mi-ombre en été',eau:'Régulier le soir',rec:'Avr–Juin, Sep–Nov',
+    semer:'Mar–Sep toutes les 3 semaines',planter:'Avr–Mai, Août–Sep',
+    good:'Radis, carottes, tomates',bad:'Fenouil, céleri',
+    taches:{
+      mai:['Planter le cœur hors de terre','Pièges à limaces','Arrosage quotidien'],
+      juin:['Récolter avant montaison','Ressemer pour une 2e vague','Voile d\'ombrage si canicule'],
+      aout:['Ressemer pour l\'automne'],
+      septembre:['Belle saison automnale','Arroser régulièrement'],
+    }},
+  epinard:{e:'🌿',n:'Épinard',cat:'Légume-feuille',famille:'Amaranthacée',
+    esp:'15–20cm',sol:'Mi-ombre',eau:'Régulier',rec:'Avr–Juin, Sep–Nov',
+    semer:'Mar–Avr, Août–Sep',planter:'Avr, Août–Sep',
+    good:'Fraises, radis',bad:'Betteraves',
+    taches:{
+      mai:['Semer en place','Arroser régulièrement','Récolte rapide'],
+      septembre:['Ressemer pour l\'hiver','Sol enrichi en compost'],
+    }},
+  roquette:{e:'🌱',n:'Roquette',cat:'Légume-feuille',famille:'Brassicacée',
+    esp:'15–20cm',sol:'Mi-ombre',eau:'Régulier',rec:'Avr–Juin, Sep–Nov',
+    semer:'Toutes les 3 semaines',planter:'Avr–Mai, Août–Sep',
+    good:'Tomates, radis',bad:'Fraises',
+    taches:{
+      mai:['Semer en place directement','Récolte en 4-6 semaines'],
+      juin:['Couper avant montaison','Ressemer régulièrement'],
+    }},
+  // RACINES
+  betterave:{e:'🫚',n:'Betterave',cat:'Légume-racine',famille:'Amaranthacée',
+    esp:'15–20cm',sol:'Soleil à mi-ombre',eau:'Régulier, éviter à-coups',rec:'Juil–Oct',
+    semer:'Avr–Juil en place',planter:'Avr–Mai',
+    good:'Ciboulette, oignons, salades',bad:'Haricots, maïs',
+    taches:{
+      mai:['Planter en pleine terre ameublie 30cm','Ne pas mettre de compost frais'],
+      juin:['Arrosage régulier','Biner entre les rangs'],
+      juillet:['Récolter à 6-8cm de diamètre','Ressemer pour automne'],
+      septembre:['Récolte d\'automne','Stocker en cave dans le sable'],
+    }},
+  carotte:{e:'🥕',n:'Carotte',cat:'Légume-racine',famille:'Apiacée',
+    esp:'5–8cm',sol:'Soleil',eau:'Régulier',rec:'Juil–Nov',
+    semer:'Mar–Juil en place',planter:'Semis direct uniquement',
+    good:'Tomates, salade, ciboulette',bad:'Fenouil, aneth',
+    taches:{
+      mars:['Semer en place sol ameubli 30cm','Éclaircir à 5cm'],
+      mai:['Biner régulièrement','Arrosage modéré'],
+      juillet:['Première récolte des carottes précoces'],
+      octobre:['Grande récolte','Stocker en cave'],
+    }},
+  radis:{e:'🔴',n:'Radis',cat:'Légume-racine',famille:'Brassicacée',
+    esp:'5–8cm',sol:'Mi-ombre',eau:'Régulier',rec:'3-4 semaines après semis',
+    semer:'Toutes les 3 semaines d\'Avr à Sep',planter:'Semis direct uniquement',
+    good:'Salades, betteraves, tomates',bad:'Vignes',
+    taches:{
+      mai:['Semer directement','Récolte en 3-4 semaines','Repousse les altises'],
+      juin:['Ressemer toutes les 3 semaines','Arroser régulièrement'],
+    }},
+  // AROMATIQUES
+  basilic:{e:'🌿',n:'Basilic',cat:'Aromatique',famille:'Lamiacée',
+    esp:'20–25cm',sol:'Plein soleil chaud',eau:'Régulier, pas le soir',rec:'Juin–Sep',
+    semer:'Avr sous abri',planter:'Mai (>15°C)',
+    good:'Tomates, poivrons, aubergines',bad:'Sauge, thym',
+    taches:{
+      mai:['Planter après 15°C','Plein soleil protégé du vent'],
+      juin:['Pincer les tiges florales','Récolter régulièrement'],
+      juillet:['Récolter abondamment','Faire le pesto !'],
+    }},
+  persil:{e:'🌿',n:'Persil',cat:'Aromatique',famille:'Apiacée',
+    esp:'20–25cm',sol:'Soleil à mi-ombre',eau:'Régulier',rec:'Toute l\'année',
+    semer:'Fév–Août',planter:'Avr–Mai, Sep',
+    good:'Tomates, carottes',bad:'Fenouil',
+    taches:{
+      mai:['Semer ou planter','Arrosage modéré'],
+      juin:['Récolte régulière','Éviter la montaison'],
+    }},
+  ciboulette:{e:'🌱',n:'Ciboulette',cat:'Aromatique',famille:'Alliacée',
+    esp:'20cm en touffe',sol:'Soleil à mi-ombre',eau:'Modéré',rec:'Toute l\'année',
+    semer:'Avr–Mai',planter:'Avr–Mai',
+    good:'Betteraves, carottes, tomates',bad:'Pois, haricots',
+    taches:{
+      mai:['Planter ou diviser les touffes'],
+      juin:['Récolter régulièrement','Couper les fleurs pour continuer la récolte'],
+    }},
+  thym:{e:'🌿',n:'Thym',cat:'Aromatique',famille:'Lamiacée',
+    esp:'30cm',sol:'Plein soleil, sec',eau:'Peu',rec:'Toute l\'année',
+    semer:'Avr–Mai',planter:'Avr–Mai ou Sep',
+    good:'Rosiers, choux',bad:'Basilic',
+    taches:{
+      mai:['Planter en sol drainé'],
+      juillet:['Tailler après floraison','Faire sécher les bouquets'],
+    }},
+  romarin:{e:'🌿',n:'Romarin',cat:'Aromatique',famille:'Lamiacée',
+    esp:'60–80cm',sol:'Plein soleil sec',eau:'Très peu',rec:'Toute l\'année',
+    semer:'Bouturage ou achat',planter:'Avr–Mai ou Sep',
+    good:'Choux, carottes',bad:'Rien',
+    taches:{
+      mai:['Planter en sol très drainé','Peu d\'arrosage'],
+      juillet:['Tailler légèrement après floraison'],
+    }},
+  menthe:{e:'🌿',n:'Menthe',cat:'Aromatique',famille:'Lamiacée',
+    esp:'Isoler en pot (envahissante)',sol:'Mi-ombre humide',eau:'Régulier',rec:'Avr–Oct',
+    semer:'Avr (plutôt diviser)',planter:'Avr–Mai',
+    good:'Choux, tomates',bad:'Persil',
+    taches:{
+      mai:['Planter en pot isolé','Éviter qu\'elle envahisse le jardin'],
+      juin:['Récolter régulièrement','Couper les fleurs'],
+    }},
+  // FRUITS
+  fraise:{e:'🍓',n:'Fraise',cat:'Petit fruit',famille:'Rosacée',
+    esp:'25–30cm',sol:'Soleil à mi-ombre',eau:'Régulier sans mouiller les feuilles',rec:'Mai–Juin (non rem.), Juin–Oct (rem.)',
+    semer:'Achat de plants',planter:'Avr–Mai, Sep–Oct',
+    good:'Bourrache, ail, soucis',bad:'Choux, fenouil',
+    taches:{
+      mai:['Collet au niveau du sol','Pailler sous les fruits','Arrosage régulier'],
+      juin:['Récolter le matin','Couper les stolons','Surveiller botrytis'],
+      juillet:['Remontantes : 2e vague en août-sep'],
+      septembre:['Remontantes : belle récolte d\'automne'],
+      octobre:['Couper à ras, pailler pour l\'hiver'],
+    }},
+  // LÉGUMINEUSES
+  haricot_vert:{e:'🫘',n:'Haricot vert',cat:'Légumineuse',famille:'Fabacée',
+    esp:'10–15cm (nains), 1 pied/tuteur (grimpants)',sol:'Soleil',eau:'Régulier',rec:'Juil–Sep',
+    semer:'Mai–Juin en place',planter:'Mai–Juin',
+    good:'Courgettes, carottes, concombres',bad:'Betteraves, oignons',
+    taches:{
+      mai:['Semer en place après le 15 mai','1 pied par tuteur si grimpants'],
+      juin:['Arrosage régulier','Biner entre les rangs'],
+      juillet:['Récolter avant que les graines gonflent','Récolter souvent pour prolonger la production'],
+    }},
+  pois:{e:'🫛',n:'Pois',cat:'Légumineuse',famille:'Fabacée',
+    esp:'10cm',sol:'Soleil à mi-ombre',eau:'Modéré',rec:'Mai–Juil',
+    semer:'Fév–Avr en place',planter:'Fév–Avr',
+    good:'Carottes, navets, radis',bad:'Oignons, ail',
+    taches:{
+      mai:['Installer filet de support','Arrosage modéré'],
+      juin:['Récolter régulièrement','Arracher après récolte (enrichit le sol)'],
+    }},
+  // CHOUX & BRASSICAS
+  courgette_ronde:{e:'🟢',n:'Courgette ronde',cat:'Légume-fruit',famille:'Cucurbitacée',
+    esp:'80cm–1m',sol:'Plein soleil',eau:'Abondant',rec:'Juil–Sep',
+    semer:'Avr sous abri',planter:'Mai',
+    good:'Capucines, bourrache',bad:'Pomme de terre',
+    taches:{
+      mai:['Planter et pailler'],
+      juin:['Récolter à 10cm de diamètre'],
+      juillet:['Production intensive'],
+    }},
+  // BULBES
+  ail:{e:'🧄',n:'Ail',cat:'Bulbe',famille:'Alliacée',
+    esp:'10–15cm',sol:'Soleil',eau:'Peu',rec:'Juin–Juil',
+    semer:'Oct–Nov ou Jan–Fév',planter:'Oct–Nov (automne)',
+    good:'Tomates, carottes, fraises',bad:'Pois, haricots',
+    taches:{
+      octobre:['Planter les caïeux en sol bien drainé','Pointe vers le haut'],
+      novembre:['Pailler légèrement contre le gel'],
+      juin:['Récolter quand les feuilles jaunissent','Faire sécher 3 semaines'],
+    }},
+  oignon:{e:'🧅',n:'Oignon',cat:'Bulbe',famille:'Alliacée',
+    esp:'10–15cm',sol:'Soleil',eau:'Modéré',rec:'Août–Sep',
+    semer:'Fév–Mar sous abri',planter:'Avr–Mai',
+    good:'Carottes, betteraves, laitues',bad:'Pois, haricots',
+    taches:{
+      mai:['Planter les bulbilles','Sol bien ameubli'],
+      juin:['Biner régulièrement','Peu d\'arrosage'],
+      aout:['Récolter quand les tiges tombent','Faire sécher au soleil'],
+    }},
+  // FLEURS COMPAGNES
+  souci:{e:'🌼',n:'Souci / Calendula',cat:'Fleur compagne',famille:'Astéracée',
+    esp:'25–30cm',sol:'Plein soleil',eau:'Peu',rec:'Fleurs toute la saison',
+    semer:'Mar–Avr sous abri ou Mai en place',planter:'Avr–Mai',
+    good:'Universel — bénéfique partout',bad:'Aucune',
+    taches:{
+      mai:['Semer ou planter en bordure','Repousse nématodes et pucerons'],
+      juin:['Récolter les fleurs pour les tisanes','Se ressème seul'],
+    }},
+  capucine:{e:'🌸',n:'Capucine',cat:'Fleur compagne',famille:'Tropaéolacée',
+    esp:'30cm',sol:'Soleil à mi-ombre',eau:'Peu',rec:'Fleurs toute la saison',
+    semer:'Avr–Mai en place',planter:'Avr–Mai',
+    good:'Courgettes, concombres, tomates',bad:'Aucune',
+    taches:{
+      mai:['Semer en place','Plante-piège contre les pucerons'],
+      juin:['Fleurs comestibles','Se ressème seul'],
+    }},
+  bourrache:{e:'💙',n:'Bourrache',cat:'Fleur compagne',famille:'Boraginacée',
+    esp:'30–40cm',sol:'Soleil',eau:'Peu',rec:'Fleurs tout l\'été',
+    semer:'Avr–Mai en place',planter:'Avr–Mai',
+    good:'Courgettes, melons, tomates, fraises',bad:'Aucune',
+    taches:{
+      mai:['Semer en place','Attire les pollinisateurs'],
+      juin:['Fleurs bleues comestibles','Se ressème seul chaque année'],
+    }},
+  // OSEILLE & VIVACES
+  oseille:{e:'🌿',n:'Oseille',cat:'Vivace',famille:'Polygonacée',
+    esp:'30cm',sol:'Mi-ombre à soleil',eau:'Modéré',rec:'Avr–Oct',
+    semer:'Avr–Mai',planter:'Avr–Mai ou Sep',
+    good:'Betteraves, carottes',bad:'Aucune',
+    taches:{
+      mai:['Planter ou diviser les touffes','Vivace : revient chaque année'],
+      juin:['Récolter feuilles extérieures','Couper les tiges florales'],
+      juillet:['Continue à produire','Arroser en sécheresse'],
+    }},
+};
+
+// Catégories
+var CATEGORIES = ['Tous','Légume-fruit','Légume-feuille','Légume-racine','Aromatique','Petit fruit','Légumineuse','Bulbe','Fleur compagne','Vivace'];
+
+// ════════════════════════════════════════════
+// GÉNÉRATION DES TÂCHES PAR MOIS
+// ════════════════════════════════════════════
+
+var MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+var MONTHS_KEY = ['janvier','février','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','décembre'];
+var DAYS_FR = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+
+// Tâches génériques basées sur les plants sélectionnés + mois
+function generateTasksForDate(date, userConfig) {
+  var plants = userConfig.plants || [];
+  var parcelles = userConfig.parcelles || [];
+  var m = date.getMonth();
+  var monthKey = MONTHS_KEY[m];
+  var morn = [];
+  var eve = [];
+  var hasBalcon = parcelles.some(function(p){return p.type==='balcon';});
+
+  // Rassembler toutes les tâches des plants pour ce mois
+  var plantTaches = [];
+  plants.forEach(function(pid) {
+    var p = PLANTS_DB[pid];
+    if (!p) return;
+    var t = p.taches && p.taches[monthKey];
+    if (t && t.length) {
+      t.forEach(function(task){
+        plantTaches.push({tag:getTagForTask(task), t:'['+p.e+' '+p.n+'] '+task, plant:pid});
+      });
+    }
+  });
+
+  // Tâches génériques d'entretien selon le mois
+  var genericMorn = getGenericMornTasks(m, hasBalcon, plants);
+  var genericEve = getGenericEveTasks(m, hasBalcon, plants);
+
+  // Mélanger : 2-3 tâches génériques + tâches plants
+  morn = genericMorn.concat(plantTaches.slice(0, Math.min(3, plantTaches.length)));
+  eve = genericEve.concat(plantTaches.slice(3, Math.min(6, plantTaches.length)));
+
+  // Limiter à 5 tâches par période
+  morn = morn.slice(0,5);
+  eve = eve.slice(0,5);
+
+  // Si rien : message vide
+  if (morn.length === 0 && eve.length === 0) return null;
+
+  return {
+    morn: morn,
+    eve: eve,
+    tip: getTipForMonth(m, plants)
+  };
+}
+
+function getTagForTask(task) {
+  var t = task.toLowerCase();
+  if (t.includes('arros') || t.includes('eau')) return 'arrosage';
+  if (t.includes('récolte') || t.includes('récolter') || t.includes('cueill')) return 'recolte';
+  if (t.includes('traitement') || t.includes('purin') || t.includes('pulvéris') || t.includes('surveiller')) return 'traitement';
+  if (t.includes('tailler') || t.includes('pince') || t.includes('couper') || t.includes('supprimer')) return 'taille';
+  if (t.includes('semer') || t.includes('planter') || t.includes('biner') || t.includes('paill') || t.includes('compost')) return 'sol';
+  if (t.includes('balcon') || t.includes('pot') || t.includes('jardinière')) return 'balcon';
+  return 'observation';
+}
+
+function getGenericMornTasks(m, hasBalcon, plants) {
+  var tasks = [];
+  var hasSolan = plants.some(function(p){return ['tomate','tomate_cerise','poivron','aubergine'].includes(p);});
+  var hasCucurbit = plants.some(function(p){return ['courgette','courge','melon','concombre'].includes(p);});
+
+  if (m >= 4 && m <= 8) {
+    tasks.push({tag:'arrosage', t:'Arroser au pied tôt le matin (avant 9h) — évite l\'évaporation'});
+    if (hasBalcon) tasks.push({tag:'balcon', t:'Vérifier l\'humidité des jardinières au doigt — arroser si sec en surface'});
+  }
+  if (m === 4) tasks.push({tag:'sol', t:'Désherber et ameublir les zones de plantation'});
+  if (m >= 5 && m <= 7 && hasSolan) tasks.push({tag:'taille', t:'Pincer les gourmands des tomates (pousses à l\'aisselle des feuilles)'});
+  if (m >= 6 && m <= 8) tasks.push({tag:'observation', t:'Inspecter les feuilles par-dessous : pucerons, araignées rouges ?'});
+  if (m === 7 || m === 8) tasks.push({tag:'arrosage', t:'En canicule : prévoir un 2e arrosage des jardinières le soir après 19h'});
+  if (m === 8) tasks.push({tag:'sol', t:'Semer une jardinière de salades d\'automne (variété batavia résistante)'});
+  if (m >= 9) tasks.push({tag:'sol', t:'Réduire progressivement les arrosages avec la fraîcheur'});
+  return tasks;
+}
+
+function getGenericEveTasks(m, hasBalcon, plants) {
+  var tasks = [];
+  var hasSolan = plants.some(function(p){return ['tomate','tomate_cerise','poivron','aubergine'].includes(p);});
+
+  if (m >= 4 && m <= 8) {
+    tasks.push({tag:'observation', t:'Tour du jardin : surveiller limaces, pucerons, signes de maladie'});
+  }
+  if (m >= 5 && m <= 7 && hasSolan) {
+    tasks.push({tag:'traitement', t:'Alterner purin d\'ortie (10% foliaire) et macérat de prêle (20%) chaque semaine'});
+  }
+  if (m >= 5 && m <= 9) {
+    tasks.push({tag:'sol', t:'Biner légèrement entre les rangs pour aérer le sol et limiter les adventices'});
+  }
+  if (m === 9 || m === 10) {
+    tasks.push({tag:'recolte', t:'Récolter tout ce qui est mûr avant les premières gelées'});
+    tasks.push({tag:'sol', t:'Préparer les espaces libérés : compost + paillis hivernal'});
+  }
+  if (m === 10 || m === 11) {
+    tasks.push({tag:'sol', t:'Nettoyer et ranger les outils, vider les jardinières'});
+    tasks.push({tag:'observation', t:'Bilan de saison : noter variétés, rendements, améliorations'});
+  }
+  return tasks;
+}
+
+function getTipForMonth(m, plants) {
+  var tips = [
+    'Janvier : planifier la saison, commander les graines, préparer le compost.',
+    'Février : premiers semis sous abri (tomates, poivrons). Sol froid dehors.',
+    'Mars : semis en masse sous abri. Préparer les planches dehors.',
+    'Avril : plantation progressive. Surveiller les gelées tardives.',
+    'Mai : planter après les Saints de Glace (15 mai). Démarrer le purin d\'ortie.',
+    'Juin : croissance explosive ! Arrosage régulier, traitements préventifs hebdomadaires.',
+    'Juillet : chaleur intense. Arrosage quotidien tôt le matin. Premières grandes récoltes.',
+    'Août : apogée de la récolte. Penser aux conserves et congélation. Semer pour l\'automne.',
+    'Septembre : dernières récoltes estivales + début des récoltes d\'automne. Planter l\'ail.',
+    'Octobre : nettoyage et hivernage. Stocker courges et betteraves en cave.',
+    'Novembre : sol à couvrir pour protéger la vie microbienne. Commander graines 2027.',
+    'Décembre : repos du jardinier. Planifier, lire, commander les plants de la prochaine saison.',
+  ];
+  return tips[m] || '';
+}
+
+// ════════════════════════════════════════════
+// MÉTÉO (API Open-Meteo gratuite, sans clé)
+// ════════════════════════════════════════════
+
+var weatherCache = null;
+var weatherDate = null;
+
+function fetchWeather(lat, lon, callback) {
+  var today = new Date().toISOString().split('T')[0];
+  if (weatherCache && weatherDate === today) { callback(weatherCache); return; }
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=auto&forecast_days=3';
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var w = {
+        tmax: Math.round(data.daily.temperature_2m_max[0]),
+        tmin: Math.round(data.daily.temperature_2m_min[0]),
+        rain: data.daily.precipitation_sum[0],
+        code: data.daily.weathercode[0],
+        tomorrow_tmax: Math.round(data.daily.temperature_2m_max[1]),
+        tomorrow_rain: data.daily.precipitation_sum[1],
+      };
+      weatherCache = w;
+      weatherDate = today;
+      callback(w);
+    })
+    .catch(function(){ callback(null); });
+}
+
+function getWeatherIcon(code) {
+  if (!code && code !== 0) return '🌡️';
+  if (code === 0) return '☀️';
+  if (code <= 3) return '⛅';
+  if (code <= 48) return '🌫️';
+  if (code <= 67) return '🌧️';
+  if (code <= 77) return '❄️';
+  if (code <= 82) return '🌦️';
+  return '⛈️';
+}
+
+function getWeatherAlert(w) {
+  if (!w) return null;
+  if (w.tmin < 2) return '⚠️ Gel possible cette nuit ('+w.tmin+'°C) — rentrer les plants frileaux !';
+  if (w.tmax > 35) return '🌡️ Canicule prévue ('+w.tmax+'°C) — doubler l\'arrosage des jardinières';
+  if (w.rain > 15) return '🌧️ Fortes pluies prévues ('+w.rain+'mm) — arrosage inutile, surveiller drainage';
+  if (w.rain > 5) return '🌦️ Pluie prévue ('+w.rain+'mm) — réduire l\'arrosage';
+  return null;
+}
+
+// ════════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════════
+
+var SK = 'potager-pro-v1';
+var SK_TASKS = 'potager-tasks-v1';
+
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem(SK) || 'null'); } catch(e) { return null; }
+}
+function saveConfig(c) { try { localStorage.setItem(SK, JSON.stringify(c)); } catch(e) {} }
+function loadTasks() { try { return JSON.parse(localStorage.getItem(SK_TASKS) || '{}'); } catch(e) { return {}; } }
+function saveTasks(d) { try { localStorage.setItem(SK_TASKS, JSON.stringify(d)); } catch(e) {} }
+function isTaskDone(id) { return !!loadTasks()[id]; }
+function toggleTask(id) { var d=loadTasks(); if(d[id]) delete d[id]; else d[id]=1; saveTasks(d); }
+
+function dateKey(date) {
+  return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+}
+function dateKeyStr(y,m,d) {
+  return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+}
+
+// ════════════════════════════════════════════
+// SETUP WIZARD
+// ════════════════════════════════════════════
+
+var setupStep = 1;
+var setupData = {
+  location: null, // {lat, lon, city, country, zone}
+  parcelles: [],
+  plants: [],
+};
+var parcelCount = 0;
+
+function startSetup() {
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('setup').style.display = 'block';
+  renderSetupStep(1);
+}
+
+function renderSetupStep(step) {
+  setupStep = step;
+  var pct = (step/4)*100;
+  document.getElementById('setup-prog-fill').style.width = pct+'%';
+  document.getElementById('setup-step-label').textContent = 'Étape '+step+' sur 4';
+  var titles = ['','📍 Votre localisation','🗺️ Vos parcelles','🌱 Vos plants','✅ Confirmation'];
+  document.getElementById('setup-title').textContent = titles[step];
+  document.getElementById('setup-back-btn').style.display = step > 1 ? 'block' : 'none';
+  document.getElementById('setup-next-btn').textContent = step < 4 ? 'Continuer →' : '🌿 Commencer mon jardin';
+
+  var body = document.getElementById('setup-body');
+  if (step === 1) {
+    body.innerHTML = '<div class="setup-section">'+
+      '<div class="setup-section-title">Votre ville ou commune</div>'+
+      '<input class="setup-input" id="city-input" type="text" placeholder="Ex: Pau, Lyon, Bordeaux..." oninput="searchCity(this.value)">'+
+      '<div id="city-results" style="margin-top:8px"></div>'+
+      '</div>'+
+      '<div class="setup-section" style="margin-top:16px">'+
+      '<div class="setup-section-title">Ou utiliser votre position actuelle</div>'+
+      '<button class="location-btn" id="geo-btn" onclick="getGeoLocation()">'+
+        '<span style="font-size:20px">📍</span> Utiliser ma position GPS'+
+      '</button>'+
+      '<div class="location-display" id="location-display"></div>'+
+      '</div>';
+    if (setupData.location) showLocationResult(setupData.location);
+  }
+  else if (step === 2) {
+    renderParcelSetup();
+  }
+  else if (step === 3) {
+    renderPlantPicker();
+  }
+  else if (step === 4) {
+    renderConfirmation();
+  }
+}
+
+// LOCALISATION
+var citySearchTimeout = null;
+function searchCity(val) {
+  if (citySearchTimeout) clearTimeout(citySearchTimeout);
+  if (val.length < 2) { document.getElementById('city-results').innerHTML=''; return; }
+  citySearchTimeout = setTimeout(function() {
+    fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(val)+'&count=5&language=fr&format=json')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var html = '';
+        if (data.results) {
+          data.results.forEach(function(r) {
+            html += '<div onclick="selectCity('+r.latitude+','+r.longitude+',\''+escQ(r.name)+'\',\''+escQ(r.country||'')+'\',\''+escQ(r.admin1||'')+'\')'+'" style="padding:10px 14px;background:var(--card);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;border:1px solid var(--border);font-size:13px;color:var(--text)">'+
+              '📍 <strong>'+r.name+'</strong> — '+(r.admin1||'')+' '+(r.country||'')+
+            '</div>';
+          });
+        }
+        document.getElementById('city-results').innerHTML = html;
+      })
+      .catch(function(){});
+  }, 400);
+}
+
+function escQ(s){ return (s||'').replace(/'/g,"\\'"); }
+
+function selectCity(lat,lon,name,country,region) {
+  var zone = getClimateZone(lat);
+  setupData.location = {lat:lat, lon:lon, city:name, country:country, region:region, zone:zone};
+  document.getElementById('city-input').value = name + (region?', '+region:'');
+  document.getElementById('city-results').innerHTML = '';
+  showLocationResult(setupData.location);
+}
+
+function getGeoLocation() {
+  var btn = document.getElementById('geo-btn');
+  btn.textContent = '⏳ Localisation en cours...';
+  btn.classList.add('active');
+  if (!navigator.geolocation) { btn.textContent = '❌ Non supporté'; return; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude, lon = pos.coords.longitude;
+    fetch('https://geocoding-api.open-meteo.com/v1/search?name=&latitude='+lat+'&longitude='+lon+'&count=1&language=fr')
+      .then(function(r){return r.json();})
+      .catch(function(){return {};})
+      .then(function() {
+        // Reverse geocoding via open-meteo
+        fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json&accept-language=fr')
+          .then(function(r){return r.json();})
+          .then(function(d) {
+            var city = d.address.city||d.address.town||d.address.village||'Votre position';
+            var country = d.address.country||'';
+            var region = d.address.state||'';
+            var zone = getClimateZone(lat);
+            setupData.location = {lat:lat, lon:lon, city:city, country:country, region:region, zone:zone};
+            btn.textContent = '✅ Position trouvée';
+            showLocationResult(setupData.location);
+          })
+          .catch(function(){
+            setupData.location = {lat:lat, lon:lon, city:'Position détectée', country:'', region:'', zone:getClimateZone(lat)};
+            btn.textContent = '✅ Position trouvée';
+            showLocationResult(setupData.location);
+          });
+      });
+  }, function(){ btn.textContent = '❌ Erreur de localisation'; btn.classList.remove('active'); });
+}
+
+function getClimateZone(lat) {
+  if (lat > 58) return 'nord-extreme';
+  if (lat > 52) return 'nord';
+  if (lat > 46) return 'centre';
+  if (lat > 42) return 'sud';
+  return 'mediterraneen';
+}
+
+function showLocationResult(loc) {
+  var d = document.getElementById('location-display');
+  if (!d) return;
+  d.style.display = 'block';
+  var zoneLabels = {'nord-extreme':'Nord extrême (Scandinavie)','nord':'Nord (Belgique, N.France)','centre':'Centre (Ile-de-France, Bretagne)','sud':'Sud-Ouest / Centre-Sud','mediterraneen':'Méditerranéen / Atlantique Sud'};
+  d.innerHTML = '✅ <strong>'+loc.city+(loc.region?', '+loc.region:'')+'</strong><br>'+
+    '🌡️ Zone climatique : '+(zoneLabels[loc.zone]||loc.zone)+'<br>'+
+    '📍 '+loc.lat.toFixed(2)+'°N, '+loc.lon.toFixed(2)+'°E';
+}
+
+// PARCELLES
+function renderParcelSetup() {
+  var html = '<div class="setup-section">'+
+    '<div class="setup-section-title">Définissez vos espaces de culture</div>'+
+    '<div class="parcel-builder" id="parcel-builder">';
+  setupData.parcelles.forEach(function(p,i){ html += buildParcelRow(p,i); });
+  html += '</div>'+
+    '<button class="add-parcel-btn" onclick="addParcel()">+ Ajouter une parcelle</button>'+
+    '</div>';
+  document.getElementById('setup-body').innerHTML = html;
+  if (setupData.parcelles.length === 0) addParcel();
+}
+
+function buildParcelRow(p, idx) {
+  return '<div class="parcel-row" id="prow-'+idx+'">'+
+    '<button class="del-parcel" onclick="delParcel('+idx+')">✕</button>'+
+    '<div class="parcel-row-header">'+
+      '<select class="parcel-type-select" onchange="updateParcel('+idx+',\'type\',this.value)">'+
+        '<option value="pleine-terre"'+(p.type==='pleine-terre'?' selected':'')+'>🌱 Pleine terre</option>'+
+        '<option value="jardiniere"'+(p.type==='jardiniere'?' selected':'')+'>🪴 Jardinière / Bac</option>'+
+        '<option value="balcon"'+(p.type==='balcon'?' selected':'')+'>🏠 Balcon / Terrasse</option>'+
+        '<option value="serre"'+(p.type==='serre'?' selected':'')+'>🏡 Serre</option>'+
+        '<option value="potee"'+(p.type==='potee'?' selected':'')+'>🫙 Pot individuel</option>'+
+      '</select>'+
+    '</div>'+
+    '<div class="parcel-dims">'+
+      '<input class="parcel-dim-input" type="number" placeholder="Long. (m)" value="'+(p.l||'')+'" oninput="updateParcel('+idx+',\'l\',this.value)" min="0.1" step="0.1">'+
+      '<input class="parcel-dim-input" type="number" placeholder="Larg. (m)" value="'+(p.w||'')+'" oninput="updateParcel('+idx+',\'w\',this.value)" min="0.1" step="0.1">'+
+    '</div>'+
+    '<div class="parcel-sun-row">'+
+      ['Plein soleil','Mi-ombre','Ombre'].map(function(s,i){
+        var val = ['full','partial','shade'][i];
+        return '<div class="sun-opt'+(p.sun===val?' active':'')+'" onclick="updateParcel('+idx+',\'sun\',\''+val+'\')">'+['☀️','⛅','🌥️'][i]+' '+s+'</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+function addParcel() {
+  var idx = setupData.parcelles.length;
+  setupData.parcelles.push({type:'pleine-terre',l:'',w:'',sun:'full',name:'Parcelle '+(idx+1)});
+  var builder = document.getElementById('parcel-builder');
+  if (builder) {
+    var div = document.createElement('div');
+    div.innerHTML = buildParcelRow(setupData.parcelles[idx], idx);
+    builder.appendChild(div.firstChild);
+  }
+}
+
+function delParcel(idx) {
+  setupData.parcelles.splice(idx,1);
+  renderParcelSetup();
+}
+
+function updateParcel(idx,key,val) {
+  if (setupData.parcelles[idx]) setupData.parcelles[idx][key] = val;
+  // Mettre à jour les boutons soleil visuellement
+  if (key === 'sun') {
+    var row = document.getElementById('prow-'+idx);
+    if (row) row.querySelectorAll('.sun-opt').forEach(function(el,i){
+      el.classList.toggle('active', ['full','partial','shade'][i] === val);
+    });
+  }
+}
+
+// PLANTS
+var currentCat = 'Tous';
+var plantSearch = '';
+
+function renderPlantPicker() {
+  var html = '<div class="setup-section">'+
+    '<div class="setup-section-title">Choisissez vos plants ('+Object.keys(PLANTS_DB).length+' disponibles)</div>'+
+    '<input class="plant-search" id="plant-search" type="text" placeholder="Rechercher..." oninput="filterPlants(this.value)">'+
+    '<div class="plant-categories" id="plant-cats">'+
+    CATEGORIES.map(function(c){
+      return '<div class="cat-btn'+(c===currentCat?' active':'')+'" onclick="setCat(\''+c+'\')">'+c+'</div>';
+    }).join('')+
+    '</div>'+
+    '<div class="plant-grid" id="plant-grid">'+buildPlantGrid()+'</div>'+
+    '<div style="margin-top:12px;font-size:12px;color:var(--text3);text-align:center">'+setupData.plants.length+' plant(s) sélectionné(s)</div>'+
+    '</div>';
+  document.getElementById('setup-body').innerHTML = html;
+}
+
+function buildPlantGrid() {
+  var html = '';
+  Object.keys(PLANTS_DB).forEach(function(pid) {
+    var p = PLANTS_DB[pid];
+    if (currentCat !== 'Tous' && p.cat !== currentCat) return;
+    if (plantSearch && !p.n.toLowerCase().includes(plantSearch)) return;
+    var sel = setupData.plants.includes(pid);
+    html += '<div class="plant-pick-card'+(sel?' selected':'')+'" id="pp-'+pid+'" onclick="togglePlant(\''+pid+'\')">';
+    html += '<span class="pp-emoji">'+p.e+'</span>';
+    html += '<div class="pp-name">'+p.n+'</div>';
+    html += '<div class="pp-cat">'+p.cat+'</div>';
+    html += '<div class="pp-check">✓</div>';
+    html += '</div>';
+  });
+  return html || '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Aucun résultat</div>';
+}
+
+function togglePlant(pid) {
+  var idx = setupData.plants.indexOf(pid);
+  if (idx >= 0) setupData.plants.splice(idx,1); else setupData.plants.push(pid);
+  var el = document.getElementById('pp-'+pid);
+  if (el) el.classList.toggle('selected', setupData.plants.includes(pid));
+  var label = document.querySelector('#setup-body .setup-section > div:last-child');
+  if (label) label.textContent = setupData.plants.length+' plant(s) sélectionné(s)';
+}
+
+function setCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.toggle('active', b.textContent===cat); });
+  var grid = document.getElementById('plant-grid');
+  if (grid) grid.innerHTML = buildPlantGrid();
+}
+
+function filterPlants(val) {
+  plantSearch = val.toLowerCase();
+  var grid = document.getElementById('plant-grid');
+  if (grid) grid.innerHTML = buildPlantGrid();
+}
+
+// CONFIRMATION
+function renderConfirmation() {
+  var loc = setupData.location;
+  var html = '<div class="setup-section">';
+  html += '<div style="background:var(--card2);border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--border2)">';
+  html += '<div style="font-size:13px;color:var(--mint);font-weight:600;margin-bottom:10px">📍 Localisation</div>';
+  html += '<div style="font-size:13px;color:var(--text)">'+( loc ? loc.city+(loc.region?', '+loc.region:'') : '⚠️ Non définie' )+'</div>';
+  html += '</div>';
+  html += '<div style="background:var(--card2);border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--border2)">';
+  html += '<div style="font-size:13px;color:var(--mint);font-weight:600;margin-bottom:10px">🗺️ Parcelles ('+setupData.parcelles.length+')</div>';
+  setupData.parcelles.forEach(function(p,i){
+    var types = {'pleine-terre':'🌱 Pleine terre','jardiniere':'🪴 Jardinière','balcon':'🏠 Balcon','serre':'🏡 Serre','potee':'🫙 Pot'};
+    html += '<div style="font-size:12px;color:var(--text);padding:4px 0">'+(types[p.type]||p.type)+(p.l&&p.w?' · '+p.l+'m × '+p.w+'m':'')+'</div>';
+  });
+  html += '</div>';
+  html += '<div style="background:var(--card2);border-radius:var(--radius);padding:16px;border:1px solid var(--border2)">';
+  html += '<div style="font-size:13px;color:var(--mint);font-weight:600;margin-bottom:10px">🌱 Plants ('+setupData.plants.length+')</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+  setupData.plants.forEach(function(pid){
+    var p = PLANTS_DB[pid];
+    if (p) html += '<span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--text)">'+p.e+' '+p.n+'</span>';
+  });
+  html += '</div></div></div>';
+  document.getElementById('setup-body').innerHTML = html;
+}
+
+function setupNext() {
+  if (setupStep === 1) {
+    if (!setupData.location) { alert('Veuillez sélectionner votre localisation'); return; }
+  }
+  if (setupStep === 2) {
+    if (setupData.parcelles.length === 0) { alert('Ajoutez au moins une parcelle'); return; }
+  }
+  if (setupStep === 3) {
+    if (setupData.plants.length === 0) { alert('Sélectionnez au moins un plant'); return; }
+  }
+  if (setupStep === 4) {
+    // Sauvegarder et lancer l'app
+    saveConfig(setupData);
+    launchApp(setupData);
+    return;
+  }
+  renderSetupStep(setupStep + 1);
+}
+
+function setupBack() {
+  if (setupStep > 1) renderSetupStep(setupStep - 1);
+}
+
+// ════════════════════════════════════════════
+// LANCEMENT APP
+// ════════════════════════════════════════════
+
+var userConfig = null;
+
+function launchApp(config) {
+  userConfig = config;
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('bottom-nav').style.display = 'flex';
+  renderToday();
+  renderCal();
+  renderParcelles();
+  renderInfo();
+}
+
+// ════════════════════════════════════════════
+// PAGE AUJOURD'HUI
+// ════════════════════════════════════════════
+
+function renderToday() {
+  var now = new Date();
+  var df = DAYS_FR[now.getDay()]+' '+now.getDate()+' '+MONTHS_FR[now.getMonth()]+' '+now.getFullYear();
+  document.getElementById('hdr-date').textContent = (userConfig&&userConfig.location?userConfig.location.city+' · ':'')+df;
+
+  var tasks = generateTasksForDate(now, userConfig);
+  var dk = dateKey(now);
+
+  var total = tasks ? tasks.morn.length + tasks.eve.length : 0;
+  var done = 0;
+  if (tasks) {
+    tasks.morn.forEach(function(t,i){ if(isTaskDone(dk+'-morn-'+i)) done++; });
+    tasks.eve.forEach(function(t,i){ if(isTaskDone(dk+'-eve-'+i)) done++; });
+  }
+  var pct = total > 0 ? Math.round(done/total*100) : 0;
+
+  var html = '<div class="today-hero">';
+  html += '<div class="today-date">'+DAYS_FR[now.getDay()]+' '+now.getDate()+' '+MONTHS_FR[now.getMonth()]+'</div>';
+  html += '<div class="today-title">Aujourd\'hui au jardin</div>';
+  if (userConfig&&userConfig.location) {
+    html += '<div class="today-location">📍 '+userConfig.location.city+'</div>';
+  }
+  html += '<div class="progress-wrap">';
+  html += '<div class="progress-bar"><div class="progress-fill" id="today-fill" style="width:'+pct+'%"></div></div>';
+  html += '<div class="progress-text" id="today-prog">'+done+'/'+total+' tâches accomplies</div>';
+  html += '</div></div>';
+
+  // Météo
+  html += '<div id="weather-zone"></div>';
+
+  if (tasks) {
+    html += buildTimeBlockHTML(tasks.morn, dk, 'morn', 'Matin', '🌅', 'morn');
+    html += buildTimeBlockHTML(tasks.eve, dk, 'eve', 'Soir', '🌙', 'eve');
+    if (tasks.tip) html += '<div class="tip-card"><strong>💡 Conseil du mois :</strong> '+tasks.tip+'</div>';
+  } else {
+    html += '<div class="empty"><div class="empty-icon">🌿</div><p>Pas de tâches spécifiques ce mois-ci.<br>Profitez du repos hivernal !</p></div>';
+  }
+
+  html += '<div style="height:20px"></div>';
+  document.getElementById('today-content').innerHTML = html;
+  restoreTaskDoneStates(dk, tasks);
+  updateTodayProgress(now, tasks);
+
+  // Charger la météo
+  if (userConfig && userConfig.location) {
+    fetchWeather(userConfig.location.lat, userConfig.location.lon, function(w) {
+      var wzone = document.getElementById('weather-zone');
+      if (!wzone) return;
+      if (!w) { wzone.innerHTML=''; return; }
+      var alert = getWeatherAlert(w);
+      var html2 = '';
+      html2 += '<div style="margin:0 14px 10px;padding:10px 14px;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2)">';
+      html2 += '<span style="font-size:22px">'+getWeatherIcon(w.code)+'</span>';
+      html2 += '<div><div style="font-weight:600;color:var(--text)">'+w.tmin+'°–'+w.tmax+'°C · '+(w.rain>0?w.rain+'mm de pluie':'Pas de pluie')+'</div>';
+      html2 += '<div>'+userConfig.location.city+'</div></div></div>';
+      if (alert) {
+        html2 += '<div class="meteo-alert">'+alert+'</div>';
+      }
+      wzone.innerHTML = html2;
+    });
+  }
+}
+
+function buildTimeBlockHTML(taskArr, dk, period, label, icon, cls) {
+  var html = '<div class="time-block">';
+  html += '<div class="time-hdr time-hdr-'+cls+'"><span style="font-size:18px">'+icon+'</span>';
+  html += '<span class="time-hdr-label lbl-'+cls+'">'+label.toUpperCase()+' — '+(cls==='morn'?'avant 10h':'après 18h')+'</span></div>';
+  html += '<div class="time-tasks tasks-'+cls+'">';
+  taskArr.forEach(function(task,i){
+    var tid = dk+'-'+period+'-'+i;
+    var done = isTaskDone(tid);
+    var dc = done ? ' done' : '';
+    html += '<div class="task-item'+dc+'" id="ti-'+tid+'" onclick="onToggleTask(\''+tid+'\',this)">';
+    html += '<div class="task-check"><svg class="chk-svg" viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5"><polyline points="1,5 5,9 11,1"/></svg></div>';
+    html += '<span class="ttag tag-'+task.tag+'">'+task.tag+'</span>';
+    html += '<span class="task-txt">'+task.t+'</span>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function onToggleTask(tid, el) {
+  toggleTask(tid);
+  var done = isTaskDone(tid);
+  el.classList.toggle('done', done);
+  // Sync dans détail calendrier
+  var el2 = document.getElementById('ti2-'+tid);
+  if (el2) el2.classList.toggle('done', done);
+  // Update progress
+  var now = new Date();
+  var tasks = generateTasksForDate(now, userConfig);
+  updateTodayProgress(now, tasks);
+  updateCalRowProg(tid);
+}
+
+function updateTodayProgress(now, tasks) {
+  if (!tasks) return;
+  var dk = dateKey(now);
+  var total = tasks.morn.length + tasks.eve.length;
+  var done = 0;
+  tasks.morn.forEach(function(t,i){ if(isTaskDone(dk+'-morn-'+i)) done++; });
+  tasks.eve.forEach(function(t,i){ if(isTaskDone(dk+'-eve-'+i)) done++; });
+  var pct = total > 0 ? Math.round(done/total*100) : 0;
+  var fill = document.getElementById('today-fill');
+  var prog = document.getElementById('today-prog');
+  if (fill) fill.style.width = pct+'%';
+  if (prog) prog.textContent = done+'/'+total+' tâches accomplies'+(pct===100?' ✅':'');
+}
+
+function restoreTaskDoneStates(dk, tasks) {
+  if (!tasks) return;
+  var allTasks = [];
+  tasks.morn.forEach(function(t,i){ allTasks.push(dk+'-morn-'+i); });
+  tasks.eve.forEach(function(t,i){ allTasks.push(dk+'-eve-'+i); });
+  allTasks.forEach(function(tid){
+    var el = document.getElementById('ti-'+tid);
+    if (el && isTaskDone(tid)) el.classList.add('done');
+  });
+}
+
+// ════════════════════════════════════════════
+// CALENDRIER
+// ════════════════════════════════════════════
+
+function renderCal() {
+  var now = new Date();
+  var currentYear = now.getFullYear();
+  var months = [];
+  // Générer les 12 prochains mois depuis maintenant
+  for (var i = 0; i < 12; i++) {
+    var m = (now.getMonth() + i) % 12;
+    var y = currentYear + Math.floor((now.getMonth() + i) / 12);
+    var days = new Date(y, m+1, 0).getDate();
+    months.push({m:m, y:y, days:days});
+  }
+
+  document.getElementById('cal-subtitle').textContent = 'Les 12 prochains mois';
+
+  var html = '';
+  months.forEach(function(mo) {
+    html += '<div class="month-header"><div class="month-name">'+MONTHS_FR[mo.m]+' '+mo.y+'</div></div>';
+    var startDay = (mo.m === now.getMonth() && mo.y === currentYear) ? now.getDate() : 1;
+    for (var d = startDay; d <= mo.days; d++) {
+      var date = new Date(mo.y, mo.m, d);
+      var dk = dateKeyStr(mo.y, mo.m+1, d);
+      var tasks = generateTasksForDate(date, userConfig);
+      var total = tasks ? tasks.morn.length + tasks.eve.length : 0;
+      var done = 0;
+      if (tasks) {
+        tasks.morn.forEach(function(t,i){ if(isTaskDone(dk+'-morn-'+i)) done++; });
+        tasks.eve.forEach(function(t,i){ if(isTaskDone(dk+'-eve-'+i)) done++; });
+      }
+      var isToday = date.toDateString() === now.toDateString();
+      var isPast = date < new Date(now.toDateString());
+      var rowCls = 'day-row'+(isToday?' today-row':'')+(isPast?' past-row':'');
+      var tags = tasks ? Array.from(new Set([...tasks.morn,...tasks.eve].map(function(t){return t.tag;}))).slice(0,4) : [];
+      var icons = {arrosage:'💧',traitement:'🌿',taille:'✂️',recolte:'🧺',sol:'🪱',observation:'👁️',balcon:'🪴',urgent:'⚠️',meteo:'🌤️'};
+      var tagIcons = tags.map(function(t){return icons[t]||'';}).join(' ');
+      var progHtml = total > 0 ? '<div class="day-prog'+(done===total&&total>0?' all':'')+'" id="calrow-'+dk+'">'+done+'/'+total+'</div>' : '';
+      var todayPill = isToday ? '<span class="today-pill">Aujourd\'hui</span>' : '';
+      html += '<div class="'+rowCls+'" onclick="showDayDetail('+mo.y+','+mo.m+','+d+')">';
+      html += '<div class="day-num">'+d+'</div>';
+      html += '<div class="day-info"><div class="day-name-txt">'+DAYS_FR[date.getDay()]+' '+d+' '+MONTHS_FR[mo.m]+todayPill+'</div>';
+      html += '<div class="day-tag-icons">'+tagIcons+'</div></div>';
+      html += progHtml;
+      html += '<div style="color:var(--text3);font-size:14px;padding-left:4px">›</div>';
+      html += '</div>';
+    }
+  });
+  document.getElementById('cal-content').innerHTML = html;
+}
+
+function showDayDetail(y, m, d) {
+  var date = new Date(y, m, d);
+  var tasks = generateTasksForDate(date, userConfig);
+  var dk = dateKeyStr(y, m+1, d);
+  var html = '';
+  html += '<div style="padding:16px 14px 8px;background:var(--bg2);border-bottom:1px solid var(--border)">';
+  html += '<div style="font-family:\'Playfair Display\',serif;font-size:18px;color:var(--mint)">'+DAYS_FR[date.getDay()]+' '+d+' '+MONTHS_FR[m]+' '+y+'</div>';
+  html += '</div>';
+
+  if (tasks) {
+    html += buildTimeBlockDetailHTML(tasks.morn, dk, 'morn', 'Matin', '🌅', 'morn');
+    html += buildTimeBlockDetailHTML(tasks.eve, dk, 'eve', 'Soir', '🌙', 'eve');
+    if (tasks.tip) html += '<div class="tip-card"><strong>💡 Conseil :</strong> '+tasks.tip+'</div>';
+  } else {
+    html += '<div class="empty"><div class="empty-icon">🌙</div><p>Pas de tâches spécifiques.<br>Repos ou entretien léger.</p></div>';
+  }
+  html += '<div style="height:20px"></div>';
+
+  document.getElementById('day-detail').innerHTML = html;
+  // Restaurer états
+  if (tasks) {
+    tasks.morn.forEach(function(t,i){
+      var tid = dk+'-morn-'+i;
+      var el = document.getElementById('ti2-'+tid);
+      if (el && isTaskDone(tid)) el.classList.add('done');
+    });
+    tasks.eve.forEach(function(t,i){
+      var tid = dk+'-eve-'+i;
+      var el = document.getElementById('ti2-'+tid);
+      if (el && isTaskDone(tid)) el.classList.add('done');
+    });
+  }
+  showPage('day');
+}
+
+function buildTimeBlockDetailHTML(taskArr, dk, period, label, icon, cls) {
+  var html = '<div class="time-block">';
+  html += '<div class="time-hdr time-hdr-'+cls+'"><span style="font-size:18px">'+icon+'</span>';
+  html += '<span class="time-hdr-label lbl-'+cls+'">'+label.toUpperCase()+' — '+(cls==='morn'?'avant 10h':'après 18h')+'</span></div>';
+  html += '<div class="time-tasks tasks-'+cls+'">';
+  taskArr.forEach(function(task,i){
+    var tid = dk+'-'+period+'-'+i;
+    var done = isTaskDone(tid);
+    var dc = done ? ' done' : '';
+    html += '<div class="task-item'+dc+'" id="ti2-'+tid+'" onclick="onToggleTask2(\''+tid+'\',this)">';
+    html += '<div class="task-check"><svg class="chk-svg" viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5"><polyline points="1,5 5,9 11,1"/></svg></div>';
+    html += '<span class="ttag tag-'+task.tag+'">'+task.tag+'</span>';
+    html += '<span class="task-txt">'+task.t+'</span>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function onToggleTask2(tid, el) {
+  toggleTask(tid);
+  var done = isTaskDone(tid);
+  el.classList.toggle('done', done);
+  var el1 = document.getElementById('ti-'+tid);
+  if (el1) el1.classList.toggle('done', done);
+  var now = new Date();
+  var tasks = generateTasksForDate(now, userConfig);
+  updateTodayProgress(now, tasks);
+  updateCalRowProg(tid);
+}
+
+function updateCalRowProg(tid) {
+  var parts = tid.split('-');
+  if (parts.length < 3) return;
+  var y = parseInt(parts[0]), m = parseInt(parts[1]), d = parseInt(parts[2]);
+  var date = new Date(y, m-1, d);
+  var tasks = generateTasksForDate(date, userConfig);
+  if (!tasks) return;
+  var dk = dateKeyStr(y, m, d);
+  var total = tasks.morn.length + tasks.eve.length;
+  var done = 0;
+  tasks.morn.forEach(function(t,i){ if(isTaskDone(dk+'-morn-'+i)) done++; });
+  tasks.eve.forEach(function(t,i){ if(isTaskDone(dk+'-eve-'+i)) done++; });
+  var el = document.getElementById('calrow-'+dk);
+  if (el) {
+    el.textContent = done+'/'+total;
+    el.className = 'day-prog'+(done===total&&total>0?' all':'');
+  }
+}
+
+function refreshAllCalRows() {
+  document.querySelectorAll('[id^="calrow-"]').forEach(function(el) {
+    var dk = el.id.replace('calrow-','');
+    var parts = dk.split('-');
+    if (parts.length < 3) return;
+    var y = parseInt(parts[0]), m = parseInt(parts[1]), d = parseInt(parts[2]);
+    var date = new Date(y, m-1, d);
+    var tasks = generateTasksForDate(date, userConfig);
+    if (!tasks) return;
+    var total = tasks.morn.length + tasks.eve.length;
+    var done = 0;
+    tasks.morn.forEach(function(t,i){ if(isTaskDone(dk+'-morn-'+i)) done++; });
+    tasks.eve.forEach(function(t,i){ if(isTaskDone(dk+'-eve-'+i)) done++; });
+    el.textContent = done+'/'+total;
+    el.className = 'day-prog'+(done===total&&total>0?' all':'');
+  });
+}
+
+// ════════════════════════════════════════════
+// PARCELLES
+// ════════════════════════════════════════════
+
+function renderParcelles() {
+  if (!userConfig) return;
+  var html = '';
+  var typeLabels = {'pleine-terre':'🌱 Pleine terre','jardiniere':'🪴 Jardinière','balcon':'🏠 Balcon','serre':'🏡 Serre','potee':'🫙 Pot'};
+  var sunLabels = {'full':'☀️ Plein soleil','partial':'⛅ Mi-ombre','shade':'🌥️ Ombre'};
+
+  userConfig.parcelles.forEach(function(p,i) {
+    var surface = (p.l && p.w) ? (parseFloat(p.l)*parseFloat(p.w)).toFixed(1)+' m²' : '';
+    html += '<div class="parcel-card-view">';
+    html += '<div class="parcel-card-hdr">';
+    html += '<div><div class="parcel-card-title">'+(typeLabels[p.type]||p.type)+(i+1 > 1 ? ' '+String.fromCharCode(64+i) : '')+'</div>';
+    html += '<div class="parcel-card-sub">'+(p.l&&p.w?p.l+'m × '+p.w+'m · ':'')+(surface?surface+' · ':'')+(sunLabels[p.sun]||'')+'</div></div>';
+    html += '<span class="parcel-card-badge">Parcelle '+(i+1)+'</span>';
+    html += '</div>';
+
+    // Plants assignés à cette parcelle (tous pour l'instant)
+    html += '<div class="plant-chips-wrap">';
+    userConfig.plants.forEach(function(pid){
+      var pl = PLANTS_DB[pid];
+      if (!pl) return;
+      html += '<div class="plant-chip-view" onclick="showPlant(\''+pid+'\')">';
+      html += pl.e+' '+pl.n;
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  if (!html) html = '<div class="empty"><div class="empty-icon">🗺️</div><p>Aucune parcelle configurée</p></div>';
+  html += '<div style="height:20px"></div>';
+  document.getElementById('parcelles-content').innerHTML = html;
+  document.getElementById('parcelles-sub').textContent = userConfig.parcelles.length+' parcelle(s) · '+userConfig.plants.length+' plant(s)';
+}
+
+function showPlant(pid) {
+  var p = PLANTS_DB[pid];
+  if (!p) return;
+  document.getElementById('s-emoji').textContent = p.e;
+  document.getElementById('s-name').textContent = p.n;
+  document.getElementById('s-family').textContent = p.famille+' · '+p.cat;
+  document.getElementById('s-pills').innerHTML =
+    '<div class="info-pill"><strong>Espacement</strong><span>'+p.esp+'</span></div>'+
+    '<div class="info-pill"><strong>Soleil</strong><span>'+p.sol+'</span></div>'+
+    '<div class="info-pill"><strong>Arrosage</strong><span>'+p.eau+'</span></div>'+
+    '<div class="info-pill"><strong>Récolte</strong><span>'+p.rec+'</span></div>'+
+    '<div class="info-pill"><strong>Semer</strong><span>'+p.semer+'</span></div>'+
+    '<div class="info-pill"><strong>Planter</strong><span>'+p.planter+'</span></div>';
+  document.getElementById('s-assoc').innerHTML =
+    '<div class="assoc-title">✅ Bonnes associations</div>'+
+    '<div class="assoc-good">'+p.good+'</div>'+
+    (p.bad?'<div class="assoc-title" style="margin-top:10px;color:var(--rust)">❌ À éviter</div><div class="assoc-bad">'+p.bad+'</div>':'');
+  document.getElementById('plant-sheet').classList.add('open');
+  document.getElementById('sheet-overlay').classList.add('open');
+}
+
+function closeSheet() {
+  document.getElementById('plant-sheet').classList.remove('open');
+  document.getElementById('sheet-overlay').classList.remove('open');
+}
+
+// ════════════════════════════════════════════
+// RECETTES & INFOS
+// ════════════════════════════════════════════
+
+var RECETTES = [
+  {title:'🌿 Purin d\'ortie',color:'#2a5a18',body:'<strong>Usage :</strong> Engrais azoté, stimulant de croissance, répulsif pucerons.<br><strong>Recette :</strong> 1 kg d\'orties fraîches + 10 L d\'eau non chlorée. Macérer 10–15 jours en remuant chaque jour. Filtrer.<br><strong>Dilution :</strong> 20% au pied · 10% foliaire · 5% anti-pucerons.'},
+  {title:'🧄 Décoction d\'ail',color:'#1a4a10',body:'<strong>Usage :</strong> Fongicide naturel, anti-mildiou, anti-oïdium.<br><strong>Recette :</strong> 100g d\'ail écrasé + 1L d\'eau. Bouillir 5 min, filtrer. Diluer à 5% et pulvériser le soir.'},
+  {title:'🌼 Macérat de prêle',color:'#1a3a20',body:'<strong>Usage :</strong> Renforce les défenses, anti-mildiou préventif.<br><strong>Recette :</strong> 150g de prêle séchée + 1L eau. Bouillir 20 min, infuser 24h. Diluer à 20%, pulvériser 1×/semaine.'},
+  {title:'🍺 Piège à limaces',color:'#2a2010',body:'Enterrer un pot jusqu\'au bord, remplir au 2/3 de bière blonde. Couvrir d\'une tuile. Vider chaque matin. Renouveler la bière tous les 2-3 jours. Efficace à 50cm.'},
+  {title:'🫚 Savon noir + Neem',color:'#0a2a1a',body:'<strong>Usage :</strong> Pucerons, aleurodes, araignées rouges.<br><strong>Recette :</strong> 5mL savon noir + 5mL huile de neem dans 1L eau tiède. Pulvériser le matin. Éviter le soleil direct.'},
+  {title:'🌾 Règles du paillage',color:'#1a1208',body:'<strong>Épaisseur :</strong> 8-10cm (tomates), 6-8cm (courgettes), 4-5cm (betteraves), 3-4cm (salades, fraises).<br><strong>Règle d\'or :</strong> 5cm d\'espace libre autour du collet. Pailler sur sol humide. Paille bien sèche uniquement.'},
+  {title:'☕ Marc de café & cendres',color:'#1a0a00',body:'Marc de café en cercle autour des plants : répulsif limaces + engrais léger.<br>Cendres de bois sèches : barrière physique contre les limaces. À renouveler après chaque pluie.'},
+];
+
+function renderInfo() {
+  var html = '';
+  RECETTES.forEach(function(r,i){
+    html += '<div class="recipe-card" id="rec-'+i+'" style="border-left-color:'+r.color+'">';
+    html += '<div class="recipe-hdr" onclick="toggleRecipe('+i+')">';
+    html += '<div class="recipe-hdr-title">'+r.title+'</div>';
+    html += '<span class="recipe-chevron">▼</span>';
+    html += '</div>';
+    html += '<div class="recipe-body">'+r.body+'</div>';
+    html += '</div>';
+  });
+
+  // Paramètres
+  html += '<div style="margin:16px 14px 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)">Paramètres</div>';
+  html += '<div class="settings-card">';
+  if (userConfig && userConfig.location) {
+    html += '<div class="settings-row" onclick="modifyLocation()"><div><div class="settings-label">📍 Localisation</div><div class="settings-value">'+userConfig.location.city+'</div></div><div class="settings-chevron">›</div></div>';
+  }
+  html += '<div class="settings-row" onclick="modifyPlants()"><div><div class="settings-label">🌱 Mes plants</div><div class="settings-value">'+(userConfig?userConfig.plants.length:0)+' plant(s)</div></div><div class="settings-chevron">›</div></div>';
+  html += '<div class="settings-row" onclick="modifyParcelles()"><div><div class="settings-label">🗺️ Mes parcelles</div><div class="settings-value">'+(userConfig?userConfig.parcelles.length:0)+' parcelle(s)</div></div><div class="settings-chevron">›</div></div>';
+  html += '</div>';
+
+  html += '<button class="danger-btn" onclick="resetApp()">🗑️ Réinitialiser l\'application</button>';
+  html += '<div style="text-align:center;padding:20px;font-size:11px;color:var(--text3)">PotagerPro v1.0 · 100% Bio · '+Object.keys(PLANTS_DB).length+' plants disponibles<br>Données météo : Open-Meteo (gratuit, sans inscription)</div>';
+  html += '<div style="height:20px"></div>';
+  document.getElementById('info-content').innerHTML = html;
+}
+
+function toggleRecipe(i) {
+  var card = document.getElementById('rec-'+i);
+  card.classList.toggle('open');
+}
+
+function modifyPlants() {
+  setupData = JSON.parse(JSON.stringify(userConfig));
+  document.getElementById('setup').style.display = 'block';
+  renderSetupStep(3);
+}
+function modifyParcelles() {
+  setupData = JSON.parse(JSON.stringify(userConfig));
+  document.getElementById('setup').style.display = 'block';
+  renderSetupStep(2);
+}
+function modifyLocation() {
+  setupData = JSON.parse(JSON.stringify(userConfig));
+  document.getElementById('setup').style.display = 'block';
+  renderSetupStep(1);
+}
+
+function resetApp() {
+  if (confirm('Réinitialiser complètement l\'application ? Toutes vos données seront effacées.')) {
+    localStorage.removeItem(SK);
+    localStorage.removeItem(SK_TASKS);
+    location.reload();
+  }
+}
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(el){ el.classList.remove('active'); });
+  if (p === 'day') {
+    document.getElementById('page-day').classList.add('active');
+  } else {
+    document.getElementById('page-'+p).classList.add('active');
+    var nb = document.getElementById('nav-'+p);
+    if (nb) nb.classList.add('active');
+    if (p === 'cal') refreshAllCalRows();
+    if (p === 'today') renderToday();
+  }
+  var pg = document.getElementById(p==='day'?'page-day':'page-'+p);
+  if (pg) pg.scrollTop = 0;
+}
+
+function backToCal() { showPage('cal'); }
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+
+(function init() {
+  var config = loadConfig();
+  if (config && config.location && config.plants && config.plants.length > 0) {
+    document.getElementById('onboarding').style.display = 'none';
+    userConfig = config;
+    launchApp(config);
+  } else {
+    // Afficher l'onboarding
+    document.getElementById('bottom-nav').style.display = 'none';
+  }
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function() { console.log('SW: OK'); })
+      .catch(function(e) { console.log('SW: erreur', e); });
+  });
+}
+</script>
+</body>
+</html>
